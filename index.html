@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Amahoro MCC Billing System</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body style="background: url('background.jpg') center/cover no-repeat; background-attachment: fixed;">
+
+    <div class="container">
+  <img src="amahoro.png" width="200pxl" heigth="200pxl">
+       <h1><STRONG><B><U>AMAHORO MILK COLLECTION CENTER</U></B></STRONG></h1>
+        
+
+        <form id="billingForm">
+
+            <!-- Farmer Name -->
+            <label for="farmerName">
+                Farmer's Full Name
+            </label>
+
+            <input
+                type="text"
+                id="farmerName"
+                placeholder="Enter farmer name"
+            >
+
+            <!-- Liters Delivered -->
+            <label for="liters">
+                Liters Delivered
+            </label>
+
+            <input
+                type="number"
+                id="liters"
+                placeholder="Enter liters delivered"
+            >
+
+            <!-- Milk Quality Tier -->
+            <label for="tier">
+                Milk Quality Tier
+            </label>
+
+            <select id="tier">
+
+                <option value="400">
+                    Standard Tier (400 RWF per liter)
+                </option>
+
+                <option value="450">
+                    Premium Tier (450 RWF per liter)
+                </option>
+
+                <option value="500">
+                    Super Premium Tier (500 RWF per liter)
+                </option>
+
+            </select>
+
+            <!-- Generate Invoice Button -->
+            <button id="generateBtn">
+                Generate Invoice
+            </button>
+
+        </form>
+
+        <!-- Output Receipt Placeholder -->
+        <div id="output">
+
+        </div>
+
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>

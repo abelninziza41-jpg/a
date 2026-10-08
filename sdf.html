@@ -1,0 +1,141 @@
+<?php
+// Database configuration
+$host = 'localhost';
+$db_name = 'student_portal';
+$username = 'root'; // Change to your DB username
+$password = '';     // Change to your DB password
+$error_message = '';
+$success_message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
+    $pass  = trim($_POST['password']);
+    $confirm_pass = trim($_POST['confirm_password']);
+
+    if (!empty($email) && !empty($pass) && !empty($confirm_pass)) {
+        if ($pass !== $confirm_pass) {
+            $error_message = "Amambo y'ibanga ntabwo ahuye!";
+        } elseif (strlen($pass) < 6) {
+            $error_message = "Ijambo ry'ibanga rigomba kuba rinafite inyuguti cyangwa imibare birenze 6!";
+        } else {
+            try {
+                $pdo = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                // Reba niba iyo email isanzwemo muri database
+                $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+                $stmt->execute(['email' => $email]);
+                
+                if ($stmt->fetch()) {
+                    $error_message = "Iyi email isanzwe ikoreshwa n'undi munyeshuri!";
+                } else {
+                    // Guhindura password mu buryo bwarinzwe (Hashing)
+                    $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
+
+                    // Yinize umunyeshuri mushya muri database
+                    $insert_stmt = $pdo->prepare("INSERT INTO users (email, password) VALUES (:email, :password)");
+                    $insert_stmt->execute([
+                        'email' => $email,
+                        'password' => $hashed_password
+                    ]);
+
+                    $success_message = "Kwiyandikisha byagenze neza! Kanda hano ngo winjire.";
+                }
+            } catch (PDOException $e) {
+                $error_message = "Guhuza na database byanze: " . $e->getMessage();
+            }
+        }
+    } else {
+        $error_message = "Tanga amakuru mu tuzu twose!";
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #333333;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        input:focus {
+            border-color: #0066cc;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #0052a3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h1>Welcome to the Student Portal</h1>
+    <form>
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="student@school.edu" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+</body>
+</html>
